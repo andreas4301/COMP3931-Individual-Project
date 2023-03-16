@@ -1,28 +1,26 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class VMWareAPI1 : MonoBehaviour
 {
     public GameObject[] myGameObjects;
-    
+    public GameObject cubePrefab;
+    // Set up authentication headers
+    public string auth = "andreastric" + ":" + "Andreas4301!";
+
     IEnumerator Start()
     {
-        // Set up authentication headers
-        string username = "andreastric";
-        string password = "Andreas4301!";
-        string auth = username + ":" + password;
+        // Set up request parameters
         string authEncoded = System.Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(auth));
         string authHeader = string.Format("Basic {0}", authEncoded);
-
-        // Set up request parameters
         string url = "http://127.0.0.1:8697/api/vms";
         UnityWebRequest request = UnityWebRequest.Get(url);
         request.SetRequestHeader("Authorization", authHeader);
-
         // Send the request
         yield return request.SendWebRequest();
-
         // Check for errors
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
         {
@@ -33,11 +31,16 @@ public class VMWareAPI1 : MonoBehaviour
             // Parse the JSON response
             string jsonResponse = request.downloadHandler.text;
             VM[] vms = JsonHelper.FromJson<VM>(jsonResponse);
-
-            for (int i = 0; i < 4; i++)
+            Array.Resize(ref myGameObjects, vms.Length);
+            for (int i = 0; i < vms.Length; i++)
             {
+                GameObject newCube = Instantiate(cubePrefab, new Vector3(35-i*5, 0, 35-i*5), Quaternion.identity);
+                myGameObjects[i] = newCube;
+                myGameObjects[i].GetComponent<Renderer>().material.color = new Color(0.5f, 1f, 0.5f);
+                CubeClickHandler clickHandler = newCube.AddComponent<CubeClickHandler>();
+                
                 string vmID = vms[i].id;
-
+                clickHandler.vmID = vmID;
                 // Get power state of the first VM
                 url = "http://127.0.0.1:8697/api/vms/" + vmID + "/power";
                 request = UnityWebRequest.Get(url);
@@ -55,7 +58,6 @@ public class VMWareAPI1 : MonoBehaviour
                     jsonResponse = request.downloadHandler.text;
                     PowerState powerState = JsonUtility.FromJson<PowerState>(jsonResponse);
                     string state = powerState.power_state;
-
                     Debug.Log("Power State of VM " + vmID + ": " + state);
 
                     // Change the color of the game object based on power state
@@ -128,8 +130,11 @@ public class VMWareAPI1 : MonoBehaviour
     void SetGameObjectSize(int i, float memory)
     {
         Vector3 scale = myGameObjects[i].transform.localScale;
-        scale.z = 8 * (memory / 8192f); // Scale between 0.1 and 0.5 based on memory (max 8192)
+        Vector3 position = myGameObjects[i].transform.localPosition;
+        scale.y = 16 * (memory / 8192f); // Scale between 0.1 and 0.5 based on memory (max 8192)
+        position.y = 0.5f + scale.y / 2;
         myGameObjects[i].transform.localScale = scale;
+        myGameObjects[i].transform.localPosition = position;
     }
 
     // Helper class to parse JSON arrays

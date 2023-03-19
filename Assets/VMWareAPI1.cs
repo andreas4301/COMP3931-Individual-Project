@@ -6,12 +6,18 @@ using UnityEngine.UI;
 
 public class VMWareAPI1 : MonoBehaviour
 {
+    [System.Serializable]
+    public class VM
+    {
+        public string id;
+        public string path;
+    }
     public GameObject[] myGameObjects;
     public GameObject cubePrefab;
     // Set up authentication headers
     public string auth = "andreastric" + ":" + "Andreas4301!";
-
-    IEnumerator Start()
+    public VM[] vms;
+    public IEnumerator Start()
     {
         // Set up request parameters
         string authEncoded = System.Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(auth));
@@ -30,14 +36,14 @@ public class VMWareAPI1 : MonoBehaviour
         {
             // Parse the JSON response
             string jsonResponse = request.downloadHandler.text;
-            VM[] vms = JsonHelper.FromJson<VM>(jsonResponse);
+            vms = JsonHelper.FromJson<VM>(jsonResponse);
             Array.Resize(ref myGameObjects, vms.Length);
             for (int i = 0; i < vms.Length; i++)
             {
                 GameObject newCube = Instantiate(cubePrefab, new Vector3(35-i*5, 0, 35-i*5), Quaternion.identity);
                 myGameObjects[i] = newCube;
                 myGameObjects[i].GetComponent<Renderer>().material.color = new Color(0.5f, 1f, 0.5f);
-                CubeClickHandler clickHandler = newCube.AddComponent<CubeClickHandler>();
+                CubeClickHandler clickHandler = myGameObjects[i].AddComponent<CubeClickHandler>();
                 
                 string vmID = vms[i].id;
                 clickHandler.vmID = vmID;
@@ -64,10 +70,12 @@ public class VMWareAPI1 : MonoBehaviour
                     if (state == "poweredOn")
                     {
                         myGameObjects[i].GetComponent<Renderer>().material.color = Color.blue;
+                        clickHandler.power = "off";
                     }
                     else
                     {
                         myGameObjects[i].GetComponent<Renderer>().material.color =  new Color(6f/255f, 171f/255f, 4f/255f);
+                        clickHandler.power = "on";
                     }
                     // Get settings of the first VM
                     url = "http://127.0.0.1:8697/api/vms/" + vmID;
@@ -120,12 +128,7 @@ public class VMWareAPI1 : MonoBehaviour
         public int processors;
     }
 
-    [System.Serializable]
-    private class VM
-    {
-        public string id;
-        public string path;
-    }
+   
 
     void SetGameObjectSize(int i, float memory)
     {

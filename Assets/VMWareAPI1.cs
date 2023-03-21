@@ -47,6 +47,7 @@ public class VMWareAPI1 : MonoBehaviour
                 
                 string vmID = vms[i].id;
                 clickHandler.vmID = vmID;
+                clickHandler.cube = myGameObjects[i];
                 // Get power state of the first VM
                 url = "http://127.0.0.1:8697/api/vms/" + vmID + "/power";
                 request = UnityWebRequest.Get(url);
@@ -70,12 +71,10 @@ public class VMWareAPI1 : MonoBehaviour
                     if (state == "poweredOn")
                     {
                         myGameObjects[i].GetComponent<Renderer>().material.color = Color.blue;
-                        clickHandler.power = "off";
                     }
                     else
                     {
                         myGameObjects[i].GetComponent<Renderer>().material.color =  new Color(6f/255f, 171f/255f, 4f/255f);
-                        clickHandler.power = "on";
                     }
                     // Get settings of the first VM
                     url = "http://127.0.0.1:8697/api/vms/" + vmID;
@@ -103,6 +102,7 @@ public class VMWareAPI1 : MonoBehaviour
                     }
                 }
             }
+
         }
     }
 

@@ -76,8 +76,8 @@ public class CubeClickHandler : MonoBehaviour
             Debug.LogError(request2.error);
         }
         else{
-            if(power=="off") cube.GetComponent<Renderer>().material.color = new Color(6f/255f, 171f/255f, 4f/255f);
-            else cube.GetComponent<Renderer>().material.color = Color.blue;
+            if(power=="off") cube.GetComponent<Renderer>().material.color =  new Color(0f, 0f, 5f);
+            else cube.GetComponent<Renderer>().material.color = new Color(0f, 5f, 0f);
         }
         yield break;
     }

@@ -294,7 +294,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0.12598148, y: -0.84267616, z: 0.22449376, w: 0.4728934}
-  m_LocalPosition: {x: 47.5, y: 13.7, z: 33.3}
+  m_LocalPosition: {x: 63.7, y: 18.2, z: 52.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -411,5 +411,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 963a11bfb1e20614a92a67c11d27aaf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myGameObjects: []
   cubePrefab: {fileID: 5754919528988392519, guid: 4b7aad1540b1f9c4f9ddff8c0d73fe75, type: 3}
